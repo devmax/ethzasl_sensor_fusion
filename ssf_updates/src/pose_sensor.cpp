@@ -99,17 +99,18 @@ void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovaria
   // use this if your pose sensor is ethzasl_ptam (www.ros.org/wiki/ethzasl_ptam)
   // ethzasl_ptam publishes the camera pose as the world seen from the camera
   if (!measurement_world_sensor_)
-  {
-    Eigen::Matrix<double, 3, 3> C_zq = z_q_.toRotationMatrix();
-    z_q_ = z_q_.conjugate();
-    z_p_ = -C_zq.transpose() * z_p_;
+    {
+      Eigen::Matrix<double, 3, 3> C_zq = z_q_.toRotationMatrix();
+      z_q_ = z_q_.conjugate();
+      z_p_ = -C_zq.transpose() * z_p_;
 
-    Eigen::Matrix<double, 6, 6> C_cov(Eigen::Matrix<double, 6, 6>::Zero());
-    C_cov.block<3, 3> (0, 0) = C_zq;
-    C_cov.block<3, 3> (3, 3) = C_zq;
 
-    R.block<6, 6> (0, 0) = C_cov.transpose() * R.block<6, 6> (0, 0) * C_cov;
-  }
+      Eigen::Matrix<double, 6, 6> C_cov(Eigen::Matrix<double, 6, 6>::Zero());
+      C_cov.block<3, 3> (0, 0) = C_zq;
+      C_cov.block<3, 3> (3, 3) = C_zq;
+
+      R.block<6, 6> (0, 0) = C_cov.transpose() * R.block<6, 6> (0, 0) * C_cov;
+    }
   /*************************************************************************************/
 
   //  alternatively take fix covariance from reconfigure GUI
@@ -117,7 +118,7 @@ void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovaria
   {
     const double s_zp = n_zp_ * n_zp_;
     const double s_zq = n_zq_ * n_zq_;
-    R = (Eigen::Matrix<double, N_MEAS, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6).finished().asDiagonal();
+    //R = (Eigen::Matrix<double, N_MEAS, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6).finished().asDiagonal();
   }
 
   // feedback for init case
